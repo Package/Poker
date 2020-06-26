@@ -12,7 +12,7 @@ namespace Poker.Tests
         {
             var c1 = Card.FromString("AD");
             Assert.AreEqual(c1.Suit, Suit.Diamonds);
-            Assert.AreEqual(c1.Value, Value.AceHigh);
+            Assert.AreEqual(c1.Value, Value.Ace);
 
             var c2 = Card.FromString("TC");
             Assert.AreEqual(c2.Suit, Suit.Clubs);
