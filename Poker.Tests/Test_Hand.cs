@@ -43,7 +43,7 @@ namespace Poker.Tests
 
             var c1 = h1.Cards.FirstOrDefault();
             Assert.AreEqual(c1.Suit, Suit.Diamonds);
-            Assert.AreEqual(c1.Value, Value.AceHigh);
+            Assert.AreEqual(c1.Value, Value.Ace);
 
             var h2 = Hand.FromString("AD 5H");
             Assert.IsNotNull(h2.Cards);

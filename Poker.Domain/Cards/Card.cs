@@ -26,7 +26,7 @@ namespace Poker.Domain
             }
 
             var value = card[0] switch {
-                'A' => Value.AceHigh,
+                'A' => Value.Ace,
                 'K' => Value.King,
                 'Q' => Value.Queen,
                 'J' => Value.Jack,
@@ -39,7 +39,6 @@ namespace Poker.Domain
                 '4' => Value.Four,
                 '3' => Value.Three,
                 '2' => Value.Two,
-                '1' => Value.AceLow,
                 _ => throw new ArgumentException($"Unknown value in provided card: {card}")
             };
 
