@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Poker.Domain.Hands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 

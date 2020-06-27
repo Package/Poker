@@ -2,7 +2,7 @@
 {
     public enum Value
     {
-        Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace
+        None, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace
     }
 
     public static class ValueMethods
