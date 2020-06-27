@@ -15,38 +15,42 @@ namespace Poker.Evaluator.Evaluation
         /// </summary>
         /// <param name="hand"></param>
         /// <returns></returns>
-        public static HandStrength Strength(Hand hand)
+        public static HandResult Strength(Hand hand)
         {
+            var result = new HandResult { Hand = hand, Strength = HandStrength.HighCard };
+
             var values = BuildValueMap(hand);
 
             var flush = GetFlushCards(hand);
             var straight = GetStraightCards(hand);
             var pairs = Pairs(values);
-            var trips = OfAKind(values, 3);
-            var quads = OfAKind(values, 4);
+            var threeOfAKindResult = OfAKindResult(hand, values, 3);
+            var fourOfAKindResult = OfAKindResult(hand, values, 4);
 
-            if (quads > 0) 
-                return HandStrength.FourOfAKind;
+            if (fourOfAKindResult != null)
+            {
+                return fourOfAKindResult;
+            }
 
-            if (trips > 0 && pairs > 0) 
-                return HandStrength.FullHouse;
+            else if (threeOfAKindResult != null && pairs > 0)
+                result.Strength = HandStrength.FullHouse;
 
-            if (flush != null) 
-                return BestFlush(flush, straight);
+            else if (flush != null)
+                result.Strength = BestFlush(flush, straight);
 
-            if (straight != null) 
-                return HandStrength.Straight;
+            else if (straight != null)
+                result.Strength = HandStrength.Straight;
 
-            if (trips > 0) 
-                return HandStrength.ThreeOfAKind;
+            else if (threeOfAKindResult != null)
+                return threeOfAKindResult;
 
-            if (pairs >= 2) 
-                return HandStrength.TwoPair;
+            else if (pairs >= 2)
+                result.Strength = HandStrength.TwoPair;
 
-            if (pairs == 1) 
-                return HandStrength.Pair;
+            else if (pairs == 1)
+                result.Strength = HandStrength.Pair;
 
-            return HandStrength.HighCard;
+            return result;
         }
 
         /// <summary>
@@ -56,15 +60,47 @@ namespace Poker.Evaluator.Evaluation
         /// <returns></returns>
         private static int Pairs(Dictionary<Value, int> values) => values.Values.Count(v => v == 2);
 
-        /// <summary>
-        /// Returns how many values of the same kind are in the hand.
-        /// E.g. OfAKind(values, 3) would return how many three of a kinds are in the hand values.
-        /// E.g. OfAKind(values, 4) would return how many four of a kinds are in the hand values.
-        /// </summary>
-        /// <param name="values"></param>
-        /// <param name="amount"></param>
-        /// <returns></returns>
-        private static int OfAKind(Dictionary<Value, int> values, int amount) => values.Values.Count(v => v == amount);
+        private static HandResult OfAKindResult(Hand hand, Dictionary<Value, int> values, int amount)
+        {
+            Value bestValue = Value.None;
+
+            foreach (KeyValuePair<Value, int> item in values)
+            {
+                // Has three of a kind, or four of a kind.
+                if (item.Value == amount)
+                {
+                    // It's possible with 7 cards to actually have two lots of 3 of a kind, so we need the take the highest.
+                    if (item.Key > bestValue)
+                    {
+                        bestValue = item.Key;
+                    }
+                }
+            }
+
+            // Did not have any X of a kind, so return nothing.
+            if (bestValue == Value.None)
+            {
+                return null;
+            }
+
+            var core = hand.Cards.Where(c => c.Value == bestValue).ToList();
+            var kickers = hand.Cards.Except(core).OrderByDescending(c => c.Value).Take(5 - amount).ToList();
+            var strength = amount switch
+            {
+                3 => HandStrength.ThreeOfAKind,
+                4 => HandStrength.FourOfAKind,
+                _ => HandStrength.None
+            };
+
+            var result = new HandResult {
+                Hand = hand,
+                Strength = strength,
+                Core = core,
+                Kickers = kickers
+            };
+
+            return result;
+        }
 
         /// <summary>
         /// Returns the best flush that is possible. Checks for Royal and Straight flushes.

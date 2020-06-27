@@ -24,6 +24,9 @@ namespace Poker.Domain
             {
                 foreach (Value value in Enum.GetValues(typeof(Value)))
                 {
+                    if (value == Value.None)
+                        continue;
+
                     Cards.Add(new Card { Value = value, Suit = suit });
                 }
             }
