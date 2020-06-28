@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Poker.Domain
 {
-    public class Card
+    public class Card : IComparable<Card>
     {
         public Value Value { get; set; }
 
@@ -51,6 +52,20 @@ namespace Poker.Domain
             };
 
             return new Card { Value = value, Suit = suit };
+        }
+
+        /// <summary>
+        /// Compares two Card objects and returns which one is ranked higher.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(Card other)
+        {
+            if (Value > other.Value)
+                return 1;
+            else if (Value < other.Value)
+                return -1;
+            return 0;
         }
     }
 }

@@ -17,10 +17,10 @@ namespace Poker.Evaluator.Evaluation
         /// 2) The core cards
         /// 3) Any kicker cards
         /// 
-        /// For example, a hand of "AS KD 6C 5C 4D AH 8H" would return a HandResult of
-        /// Strength: One Pair
-        /// Core: AS, AH
-        /// Kickers: KD, 8H, 6C
+        /// For example, a hand of [AS KD 6C 5C 4D AH 8H] would return a HandResult of
+        /// Strength: HandStrength.Pair
+        /// Core: [AS, AH]
+        /// Kickers: [KD, 8H, 6C]
         /// 
         /// </summary>
         /// <param name="hand"></param>
@@ -168,7 +168,7 @@ namespace Poker.Evaluator.Evaluation
 
             foreach (KeyValuePair<Value, int> item in values)
             {
-                // Has three of a kind, or four of a kind.
+                // Has X of a kind.
                 if (item.Value == amount)
                 {
                     // It's possible with 7 cards to actually have two lots of 3 of a kind, so we need the take the highest.
