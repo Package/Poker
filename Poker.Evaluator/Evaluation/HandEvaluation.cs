@@ -23,17 +23,15 @@ namespace Poker.Evaluator.Evaluation
 
             var flush = GetFlushCards(hand);
             var straight = GetStraightCards(hand);
-            var pairs = Pairs(values);
+            var pairsResult = PairResult(hand, values);
             var threeOfAKindResult = OfAKindResult(hand, values, 3);
             var fourOfAKindResult = OfAKindResult(hand, values, 4);
 
             if (fourOfAKindResult != null)
-            {
                 return fourOfAKindResult;
-            }
 
-            else if (threeOfAKindResult != null && pairs > 0)
-                result.Strength = HandStrength.FullHouse;
+            else if (threeOfAKindResult != null && pairsResult != null)
+                return FullHouseResult(threeOfAKindResult, pairsResult);
 
             else if (flush != null)
                 result.Strength = BestFlush(flush, straight);
@@ -44,22 +42,75 @@ namespace Poker.Evaluator.Evaluation
             else if (threeOfAKindResult != null)
                 return threeOfAKindResult;
 
-            else if (pairs >= 2)
-                result.Strength = HandStrength.TwoPair;
-
-            else if (pairs == 1)
-                result.Strength = HandStrength.Pair;
+            else if (pairsResult != null)
+                return pairsResult;
 
             return result;
         }
 
         /// <summary>
-        /// Returns the number of pairs in the hand.
+        /// Handles building the HandResult for when a hand contains pairs.
         /// </summary>
         /// <param name="hand"></param>
+        /// <param name="values"></param>
         /// <returns></returns>
-        private static int Pairs(Dictionary<Value, int> values) => values.Values.Count(v => v == 2);
+        private static HandResult PairResult(Hand hand, Dictionary<Value, int> values)
+        {
+            var pairedValues = new List<Value>();
 
+            foreach (KeyValuePair<Value, int> item in values)
+            {
+                // Has exactly two of a value (paired)
+                if (item.Value == 2)
+                {
+                    pairedValues.Add(item.Key);
+                }
+            }
+
+            if (pairedValues.Count == 0)
+            {
+                // Did not have any pairs, so return nothing.
+                return null;
+            }
+            else if (pairedValues.Count > 2)
+            {
+                // Limit to the best pairs, as it's possible to have more than 2
+                pairedValues = pairedValues.OrderByDescending(p => p).Take(2).ToList();
+            }
+
+            var core = hand.Cards.Where(c => pairedValues.Contains(c.Value)).OrderByDescending(c => c.Value).ToList();
+            var kickersToTake = pairedValues.Count switch
+            {
+                1 => 3, // One Pair contains two cards, we need another 3 to make the best five card hand
+                2 => 1, // Two Pair contains four cards, we only need 1 more to make the best five card hand
+                _ => throw new Exception($"Unsupported number of pairs: {pairedValues.Count}")
+            };
+            var kickers = hand.Cards.Except(core).OrderByDescending(c => c.Value).Take(kickersToTake).ToList();
+            var strength = pairedValues.Count switch
+            {
+                1 => HandStrength.Pair,
+                2 => HandStrength.TwoPair,
+                _ => HandStrength.None
+            };
+
+            var result = new HandResult
+            {
+                Hand = hand,
+                Strength = strength,
+                Core = core,
+                Kickers = kickers
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Handles building the HandResult for when a hand contains X of a Kind.
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <param name="values"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
         private static HandResult OfAKindResult(Hand hand, Dictionary<Value, int> values, int amount)
         {
             Value bestValue = Value.None;
@@ -100,6 +151,34 @@ namespace Poker.Evaluator.Evaluation
             };
 
             return result;
+        }
+
+        /// <summary>
+        /// Handles building the HandResult for when a hand contains a full house. That is a combination of 
+        /// both a three of a kind and a pair.
+        /// </summary>
+        /// <param name="threeOfAKind"></param>
+        /// <param name="pairs"></param>
+        /// <returns></returns>
+        private static HandResult FullHouseResult(HandResult threeOfAKind, HandResult pairs)
+        {
+            var combinedCore = new List<Card>();
+            combinedCore.AddRange(threeOfAKind.Core);
+
+            if (pairs.Strength == HandStrength.TwoPair)
+            {
+                // If the pairs are a two pair, then just take the highest of those.
+                // E.g. imagine a seven card hand as "3S 3C 3D AH AD 5S 5H"
+                // This should take the Aces as they are a better pair than the fives.
+                var maxPair = pairs.Core.Max(c => c.Value);
+                combinedCore.AddRange(pairs.Core.Where(c => c.Value == maxPair));
+            }
+            else
+            {
+                combinedCore.AddRange(pairs.Core);
+            }
+
+            return new HandResult { Hand = threeOfAKind.Hand, Strength = HandStrength.FullHouse, Core = combinedCore };
         }
 
         /// <summary>
