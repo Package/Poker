@@ -27,16 +27,22 @@ namespace Poker.Tests
             var hand = Hand.FromString("5H 5S TC TD KH 3D 4D");
             var result = HandEvaluation.Strength(hand);
             Assert.AreEqual(HandStrength.TwoPair, result.Strength);
+            Assert.AreEqual(4, result.Core.Count);
+            Assert.AreEqual(1, result.Kickers.Count);
 
             // One Pair
             hand = Hand.FromString("QH TD 3S QC AH 2D 6S");
             result = HandEvaluation.Strength(hand);
             Assert.AreEqual(HandStrength.Pair, result.Strength);
+            Assert.AreEqual(2, result.Core.Count);
+            Assert.AreEqual(3, result.Kickers.Count);
 
             // Three Pair (should still return two pairs tho)
             hand = Hand.FromString("5H 5S TC TD KH 6D KS");
             result = HandEvaluation.Strength(hand);
             Assert.AreEqual(HandStrength.TwoPair, result.Strength);
+            Assert.AreEqual(4, result.Core.Count);
+            Assert.AreEqual(1, result.Kickers.Count);
         }
 
         [TestMethod]
@@ -137,6 +143,14 @@ namespace Poker.Tests
             var hand = Hand.FromString("4H 4S TH 4D KH KD 7H");
             var result = HandEvaluation.Strength(hand);
             Assert.AreEqual(HandStrength.FullHouse, result.Strength);
+            Assert.AreEqual(5, result.Core.Count);
+            Assert.IsNull(result.Kickers);
+
+            hand = Hand.FromString("3S 3C 3D AH AD 5S 5H");
+            result = HandEvaluation.Strength(hand);
+            Assert.AreEqual(HandStrength.FullHouse, result.Strength);
+            Assert.AreEqual(5, result.Core.Count);
+            Assert.IsNull(result.Kickers);
         }
 
         [TestMethod]
@@ -146,11 +160,15 @@ namespace Poker.Tests
             var hand = Hand.FromString("AD 2S TH 4D AS KD AH");
             var result = HandEvaluation.Strength(hand);
             Assert.AreEqual(HandStrength.ThreeOfAKind, result.Strength);
+            Assert.AreEqual(3, result.Core.Count);
+            Assert.AreEqual(2, result.Kickers.Count);
 
             // Four of a Kind
             hand = Hand.FromString("JD JS JH 4D AS JD AH");
             result = HandEvaluation.Strength(hand);
             Assert.AreEqual(HandStrength.FourOfAKind, result.Strength);
+            Assert.AreEqual(4, result.Core.Count);
+            Assert.AreEqual(1, result.Kickers.Count);
         }
     }
 }
