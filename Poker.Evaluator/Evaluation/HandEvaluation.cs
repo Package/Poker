@@ -11,41 +11,92 @@ namespace Poker.Evaluator.Evaluation
     public sealed class HandEvaluation
     {
         /// <summary>
-        /// From the hand provided, calculates the strength of it.
+        /// From the hand provided, performs a full evaluation on it to determine:
+        /// 
+        /// 1) The hand strength
+        /// 2) The core cards
+        /// 3) Any kicker cards
+        /// 
+        /// For example, a hand of "AS KD 6C 5C 4D AH 8H" would return a HandResult of
+        /// Strength: One Pair
+        /// Core: AS, AH
+        /// Kickers: KD, 8H, 6C
+        /// 
         /// </summary>
         /// <param name="hand"></param>
         /// <returns></returns>
-        public static HandResult Strength(Hand hand)
+        public static HandResult Evaluate(Hand hand)
         {
-            var result = new HandResult { Hand = hand, Strength = HandStrength.HighCard };
-
             var values = BuildValueMap(hand);
 
-            var flush = GetFlushCards(hand);
-            var straight = GetStraightCards(hand);
+            /*
+             * It's intentional that we're checking Four of a Kind and Full House before the Royal and Straight Flush,
+             * as it's not possible to have either a Royal or Straight Flush if you do have Four of a Kind or a Full House.
+             * 
+             * Four of a Kind and Full House both do beat a regular flush however so we need to check for these first, as the 
+             * logic for checking for Royal/Straight is tied in with a regular Flush.
+             */
+
+            // Four of a Kind
+            var fourOfAKindResult = OfAKindResult(hand, values, 4);
+            if (fourOfAKindResult != null)
+            {
+                return fourOfAKindResult;
+            }
+
+            // Full House
             var pairsResult = PairResult(hand, values);
             var threeOfAKindResult = OfAKindResult(hand, values, 3);
-            var fourOfAKindResult = OfAKindResult(hand, values, 4);
-
-            if (fourOfAKindResult != null)
-                return fourOfAKindResult;
-
-            else if (threeOfAKindResult != null && pairsResult != null)
+            if (threeOfAKindResult != null && pairsResult != null)
+            {
                 return FullHouseResult(threeOfAKindResult, pairsResult);
+            }
 
-            else if (flush != null)
-                result.Strength = BestFlush(flush, straight);
+            // Flush, Straight, Straight Flush, Royal Flush
+            var flushCards = GetFlushCards(hand);
+            var straightCards = GetStraightCards(hand);
+            if (flushCards != null)
+            {
+                return FlushResult(flushCards, straightCards, hand);
+            }
+            if (straightCards != null)
+            {
+                return StraightResult(straightCards, hand);
+            }
 
-            else if (straight != null)
-                result.Strength = HandStrength.Straight;
-
-            else if (threeOfAKindResult != null)
+            // Three of a Kind
+            if (threeOfAKindResult != null)
+            {
                 return threeOfAKindResult;
+            }
 
-            else if (pairsResult != null)
+            // Two Pair, One Pair
+            if (pairsResult != null)
+            {
                 return pairsResult;
+            }
 
-            return result;
+            // High Card
+            return HighCardResult(hand);
+        }
+
+        /// <summary>
+        /// Handles building the HandResult for when the hand contains nothing but a High Card.
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <returns></returns>
+        private static HandResult HighCardResult(Hand hand)
+        {
+            var highestCard = hand.Cards.TakeBest(1);
+            var kickers = hand.Cards.Except(highestCard).TakeBest(4);
+
+            return new HandResult
+            {
+                Hand = hand,
+                Strength = HandStrength.HighCard,
+                Core = highestCard,
+                Kickers = kickers
+            };
         }
 
         /// <summary>
@@ -85,7 +136,7 @@ namespace Poker.Evaluator.Evaluation
                 2 => 1, // Two Pair contains four cards, we only need 1 more to make the best five card hand
                 _ => throw new Exception($"Unsupported number of pairs: {pairedValues.Count}")
             };
-            var kickers = hand.Cards.Except(core).OrderByDescending(c => c.Value).Take(kickersToTake).ToList();
+            var kickers = hand.Cards.Except(core).TakeBest(kickersToTake);
             var strength = pairedValues.Count switch
             {
                 1 => HandStrength.Pair,
@@ -135,7 +186,7 @@ namespace Poker.Evaluator.Evaluation
             }
 
             var core = hand.Cards.Where(c => c.Value == bestValue).ToList();
-            var kickers = hand.Cards.Except(core).OrderByDescending(c => c.Value).Take(5 - amount).ToList();
+            var kickers = hand.Cards.Except(core).TakeBest(5 - amount);
             var strength = amount switch
             {
                 3 => HandStrength.ThreeOfAKind,
@@ -152,6 +203,112 @@ namespace Poker.Evaluator.Evaluation
 
             return result;
         }
+
+        /// <summary>
+        /// Handles building the HandResult for when a hand contains a straight.
+        /// </summary>
+        /// <param name="straightCards"></param>
+        /// <param name="hand"></param>
+        /// <returns></returns>
+        private static HandResult StraightResult(IEnumerable<Card> straightCards, Hand hand)
+        {
+            return new HandResult
+            {
+                Strength = HandStrength.Straight,
+                Core = straightCards.TakeBest(),
+                Hand = hand
+            };
+        }
+
+        /// <summary>
+        /// Handles building the HandResult for when a hand contains a flush.
+        /// Note that this returns the best flush that is possible, it could be a Royal, Straight or regular Flush.
+        /// </summary>
+        /// <param name="flushCards"></param>
+        /// <param name="straightCards"></param>
+        /// <returns></returns>
+        private static HandResult FlushResult(IEnumerable<Card> flushCards, IEnumerable<Card> straightCards, Hand hand)
+        {
+            var result = new HandResult { Hand = hand };
+
+            // No straight on the board - impossible to have anything better than a flush
+            if (straightCards == null)
+            {
+                result.Strength = HandStrength.Flush;
+                result.Core = flushCards.TakeBest();
+                return result;
+            }
+
+            var straightFlushCards = new List<Card>();
+            var flushSuit = flushCards.First().Suit;
+
+            /*
+             * Check for a Royal Flush.
+             * 
+             * Straight cards in range 10 to Ace need to be in same suit for Royal Flush
+             */
+            var values = (Value[])Enum.GetValues(typeof(Value));
+            var tenToAce = values[^5..^0]; // Ten to Ace range
+            foreach (var value in tenToAce)
+            {
+                var card = straightCards.FirstOrDefault(c => c.Value == value && c.Suit == flushSuit);
+                if (card != null)
+                {
+                    straightFlushCards.Add(card);
+                }
+            }
+            if (straightFlushCards.Count == 5)
+            {
+                // Found all five in the straight cards, this is a Royal Flush
+                result.Strength = HandStrength.RoyalFlush;
+                result.Core = straightFlushCards;
+                return result;
+            }
+
+            /*
+             * Check for a Straight Flush.
+             * 
+             * Five or more cards in the straight need to be of the same suit for the Straight Flush.
+             */
+            straightFlushCards.Clear();
+            foreach (var card in straightCards)
+            {
+                if (flushCards.Contains(card))
+                {
+                    straightFlushCards.Add(card);
+                }
+                else
+                {
+                    // This card isn't, but we've already seen enough to know it's a straight flush
+                    if (straightFlushCards.Count >= 5)
+                    {
+                        result.Strength = HandStrength.StraightFlush;
+                        result.Core = straightFlushCards.TakeBest();
+                        return result;
+                    }
+                    else
+                    {
+                        straightFlushCards.Clear();
+                    }
+                }
+            }
+
+            if (straightFlushCards.Count >= 5)
+            {
+                // If there's 5 or more cards matching in both the straight and the flush then it's a Straight Flush.
+                result.Strength = HandStrength.StraightFlush;
+                result.Core = straightFlushCards.TakeBest();
+            }
+            else
+            {
+                // Otherwise, it's just a regular Flush.
+                result.Strength = HandStrength.Flush;
+                result.Core = flushCards.TakeBest();
+            }
+
+            return result;
+        }
+
 
         /// <summary>
         /// Handles building the HandResult for when a hand contains a full house. That is a combination of 
@@ -181,70 +338,6 @@ namespace Poker.Evaluator.Evaluation
             return new HandResult { Hand = threeOfAKind.Hand, Strength = HandStrength.FullHouse, Core = combinedCore };
         }
 
-        /// <summary>
-        /// Returns the best flush that is possible. Checks for Royal and Straight flushes.
-        /// </summary>
-        /// <param name="flushCards"></param>
-        /// <param name="straightCards"></param>
-        /// <returns></returns>
-        private static HandStrength BestFlush(IEnumerable<Card> flushCards, IEnumerable<Card> straightCards)
-        {
-            // No straight on the board - impossible to have anything better than a flush
-            if (straightCards == null)
-                return HandStrength.Flush;
-
-            var counter = 0;
-            var flushSuit = flushCards.First().Suit;
-
-            /*
-             * Check for royal flush.
-             * Straight cards in range 10 to Ace need to be in same suit for royal flush
-             */ 
-            var values = (Value[]) Enum.GetValues(typeof(Value));
-            var tenToAce = values[^5..^0]; // Ten to Ace range
-            foreach (var value in tenToAce)
-            {
-                var card = straightCards.FirstOrDefault(c => c.Value == value && c.Suit == flushSuit);
-                if (card != null)
-                    counter += 1;
-            }
-            if (counter == 5)
-            {
-                // Found all five in the straight cards, this is a royal flush
-                return HandStrength.RoyalFlush;
-            }
-
-            /*
-             * Check for straight flush.
-             * Five or more cards in the straight need to be of the same suit for the straight flush
-             */
-            counter = 0;
-            foreach (var card in straightCards)
-            {
-                if (flushCards.Contains(card))
-                {
-                    counter += 1;
-                }
-                else
-                {
-                    // This card isn't, but we've already seen enough to know it's a straight flush
-                    if (counter >= 5)
-                        return HandStrength.StraightFlush;
-                    else
-                        counter = 0;
-                }
-            }
-
-            return counter >= 5 ? HandStrength.StraightFlush : HandStrength.Flush;
-        }
-
-        /// <summary>
-        /// Determines whether the hand is a flush.
-        /// That is, five or more cards are of the same suit.
-        /// </summary>
-        /// <param name="hand"></param>
-        /// <returns></returns>
-        private static bool IsFlush(Dictionary<Suit, int> suits) => suits.Values.Max() >= 5;
 
         /// <summary>
         /// Returns all the cards which are making this hand a flush (if any).
@@ -255,7 +348,9 @@ namespace Poker.Evaluator.Evaluation
         private static IEnumerable<Card> GetFlushCards(Hand hand)
         {
             var suitMap = BuildSuitMap(hand);
-            if (!IsFlush(suitMap))
+
+            var containsFlush = suitMap.Values.Max() >= 5;
+            if (!containsFlush)
                 return null;
 
             var flushSuit = suitMap.FirstOrDefault(s => s.Value >= 5).Key;
@@ -281,8 +376,10 @@ namespace Poker.Evaluator.Evaluation
             }
 
             var lastCard = orderedCards.FirstOrDefault();
-            var straightCards = new List<Card>();
-            straightCards.Add(lastCard);
+            var straightCards = new List<Card>
+            {
+                lastCard
+            };
 
             for (var index = 1; index < orderedCards.Count; index++)
             {
