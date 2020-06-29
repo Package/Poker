@@ -215,9 +215,36 @@ namespace Poker.Evaluator.Evaluation
             return new HandResult
             {
                 Strength = HandStrength.Straight,
-                Core = straightCards.TakeBest(),
+                Core = BestStraightCards(straightCards).ToList(),
                 Hand = hand
             };
+        }
+
+        /// <summary>
+        /// Straights need to be handled with a bit more extra care. It's possible to have an Ace complete
+        /// a low straight and in such situations, the Ace should be treated as the lowest value in the list.
+        /// </summary>
+        /// <param name="straightCards"></param>
+        /// <returns></returns>
+        private static IEnumerable<Card> BestStraightCards(IEnumerable<Card> straightCards)
+        {
+            var aceCard = straightCards.FirstOrDefault(c => c.Value == Value.Ace);
+            var twoCard = straightCards.FirstOrDefault(c => c.Value == Value.Two);
+
+            // It's a low straight when it contains an Ace and a Two
+            if (aceCard != null && twoCard != null)
+            {
+                // Put the ace to the back of the list
+                var cards = straightCards.ToList();
+                cards.Remove(aceCard);
+                cards = cards.OrderByDescending(card => card.Value).ToList();
+                cards.Add(aceCard);
+
+                return cards.Take(5);
+            }
+
+            // Otherwise, this is just a regular straight so the default logic works here.
+            return straightCards.TakeBest();
         }
 
         /// <summary>
@@ -283,7 +310,7 @@ namespace Poker.Evaluator.Evaluation
                     if (straightFlushCards.Count >= 5)
                     {
                         result.Strength = HandStrength.StraightFlush;
-                        result.Core = straightFlushCards.TakeBest();
+                        result.Core = BestStraightCards(straightFlushCards).ToList();
                         return result;
                     }
                     else
@@ -297,7 +324,7 @@ namespace Poker.Evaluator.Evaluation
             {
                 // If there's 5 or more cards matching in both the straight and the flush then it's a Straight Flush.
                 result.Strength = HandStrength.StraightFlush;
-                result.Core = straightFlushCards.TakeBest();
+                result.Core = BestStraightCards(straightFlushCards).ToList();
             }
             else
             {
