@@ -72,7 +72,7 @@ namespace Poker.Tests
             Assert.AreEqual(5, result.Core.Count);
 
             // Low 6 card straight
-            hand = Hand.FromString("AH 2D 4D 5C 6C 9S 3D");
+            hand = Hand.FromString("AH 2D 4D 5C 6C 6S 3D");
             result = HandEvaluation.Evaluate(hand);
             Assert.AreEqual(HandStrength.Straight, result.Strength);
             Assert.IsNull(result.Kickers);

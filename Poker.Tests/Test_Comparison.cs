@@ -158,31 +158,132 @@ namespace Poker.Tests
         [TestMethod]
         public void CanCompareStraight()
         {
-            // Write tests...
+            var handOne = Hand.FromString("2D 3C 5S 4H TC 6D 3C");
+            var resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.Straight, resultOne.Strength);
+
+            var handTwo = Hand.FromString("5S 4H TC 6D 3C 7D AH");
+            var resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.Straight, resultTwo.Strength);
+
+            var compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerTwo, compareResult);
+
+            handOne = Hand.FromString("TD 6C JS QS TH KC AH");
+            resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.Straight, resultOne.Strength);
+
+            handTwo = Hand.FromString("7H 4H 8C 2S 9S TC JD");
+            resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.Straight, resultTwo.Strength);
+
+            compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerOne, compareResult);
+
+            // Edge case with low ace straight
+            handOne = Hand.FromString("AH 2D 3C 4H 5S TS KD");
+            resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.Straight, resultOne.Strength);
+
+            handTwo = Hand.FromString("AH 2D 3C 4H 5S TS 6D");
+            resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.Straight, resultTwo.Strength);
+
+            compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerTwo, compareResult);
         }
 
         [TestMethod]
         public void CanCompareFlush()
         {
-            // Write tests...
+            var handOne = Hand.FromString("2C 3C 5S 4H TC 6C 3C");
+            var resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.Flush, resultOne.Strength);
+
+            var handTwo = Hand.FromString("5S 4H TH 6H 3C 7H AH");
+            var resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.Flush, resultTwo.Strength);
+
+            var compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerTwo, compareResult);
+
+            handOne = Hand.FromString("TD 6D JS QD TD KD AH");
+            resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.Flush, resultOne.Strength);
+
+            handTwo = Hand.FromString("7S 4S 8S 2S 9S TC JS");
+            resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.Flush, resultTwo.Strength);
+
+            compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerOne, compareResult);
         }
 
         [TestMethod]
         public void CanCompareFullHouse()
         {
-            // Write tests...
+            var handOne = Hand.FromString("2D 3C 3S 3H TC TH AC");
+            var resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.FullHouse, resultOne.Strength);
+
+            var handTwo = Hand.FromString("3S 3C 3D 6H 4C AD AH");
+            var resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.FullHouse, resultTwo.Strength);
+
+            var compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerTwo, compareResult);
+
+            handOne = Hand.FromString("TD TH JS JD JH KC AH");
+            resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.FullHouse, resultOne.Strength);
+
+            handTwo = Hand.FromString("7S 7D 7H 9H 9S TC JS");
+            resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.FullHouse, resultTwo.Strength);
+
+            compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerOne, compareResult);
         }
 
         [TestMethod]
         public void CanCompareStraightFlush()
         {
-            // Write tests...
+            var handOne = Hand.FromString("2C 3C 4C 5C TC TH AC");
+            var resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.StraightFlush, resultOne.Strength);
+
+            var handTwo = Hand.FromString("2C 3C 4C 5C 6C TH AC");
+            var resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.StraightFlush, resultTwo.Strength);
+
+            var compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerTwo, compareResult);
+
+            handOne = Hand.FromString("TD 9D 8D 7D 7H 6D AH");
+            resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.StraightFlush, resultOne.Strength);
+
+            handTwo = Hand.FromString("QD JD TD 9D 8D 6H 7D");
+            resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.StraightFlush, resultTwo.Strength);
+
+            compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(PlayerTwo, compareResult);
         }
 
         [TestMethod]
         public void CanCompareRoyalFlush()
         {
-            // Write tests...
+            var handOne = Hand.FromString("TC JC QC AC KC 5H 5C");
+            var resultOne = HandEvaluation.Evaluate(handOne);
+            Assert.AreEqual(HandStrength.RoyalFlush, resultOne.Strength);
+
+            var handTwo = Hand.FromString("AH KH QH JH TH 5H 6C");
+            var resultTwo = HandEvaluation.Evaluate(handTwo);
+            Assert.AreEqual(HandStrength.RoyalFlush, resultTwo.Strength);
+
+            var compareResult = resultOne.CompareTo(resultTwo);
+            Assert.AreEqual(Draw, compareResult);
         }
     }
 }
