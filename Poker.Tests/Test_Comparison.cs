@@ -16,6 +16,28 @@ namespace Poker.Tests
         const int Draw = 0;
 
         [TestMethod]
+        public void CanOrderListOfHandsCorrectly()
+        {
+            var hands = new List<Hand>()
+            {
+                Hand.FromString("3S 3C 3D 6H 4C AD AH"), // Full House 3s, Aces
+                Hand.FromString("3S 6C 6D 6H 4C AD AH"), // Full House 6s, Aces
+                Hand.FromString("3S AC AD 6H 4C AD AH"), // Four of kind
+                Hand.FromString("3S 4C 5D 6H 7C 8D AH"), // Straight
+                Hand.FromString("3S 3C 3D 6H 4C AD AH"), // Two Pair
+                Hand.FromString("3S 5C AD 6H 4C KD 9H"), // High Card
+            };
+
+            var handResults = new List<HandResult>();
+            foreach (var h in hands)
+            {
+                handResults.Add(HandEvaluation.Evaluate(h));
+            }
+            handResults.Sort((h1, h2) => h2.CompareTo(h1));
+            Assert.AreEqual(hands.Count, handResults.Count);
+        }
+
+        [TestMethod]
         public void CanCompareTiedHands()
         {
             // Same hand, players draw with Ace High Card
