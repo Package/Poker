@@ -16,7 +16,7 @@ namespace Poker.Tests
         {
             var h = new Hand();
             var c1 = Card.FromString("5D");
-            h.AddCard(c1);
+            h.AddCards(c1);
 
             Assert.AreEqual(h.Cards.Count, 1);
         }
@@ -27,7 +27,7 @@ namespace Poker.Tests
             var h = new Hand();
 
             var c1 = Card.FromString("5D");
-            h.AddCard(c1);
+            h.AddCards(c1);
             Assert.AreEqual(h.Cards.Count, 1);
 
             h.Reset();

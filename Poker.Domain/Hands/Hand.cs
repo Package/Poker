@@ -29,17 +29,30 @@ namespace Poker.Domain
         }
 
         /// <summary>
+        /// Creates a new Hand from a given collection of hole cards.
+        /// </summary>
+        /// <param name="cards"></param>
+        /// <returns></returns>
+        public static Hand FromCards(ICollection<Card> cards)
+        {
+            return new Hand { Cards = cards };
+        }
+
+        /// <summary>
         /// Adds a Card into this Hand.
         /// </summary>
         /// <param name="card"></param>
-        public void AddCard(Card card)
+        public void AddCards(params Card[] cards)
         {
             if (Cards == null)
             {
                 Cards = new List<Card>();
             }
 
-            Cards.Add(card);
+            foreach (var card in cards)
+            {
+                Cards.Add(card);
+            }
         }
 
         /// <summary>
