@@ -1,21 +1,28 @@
-﻿namespace Poker.Domain
+﻿using System;
+
+namespace Poker.Domain
 {
     public enum Suit
     {
         Spades, Clubs, Hearts, Diamonds
     }
 
-    // Example of an applying an extension method to an enum.
-
     public static class SuitMethods
     {
-        public static string ToString(this Suit suit)
-        {
-            return suit switch
+        /// <summary>
+        /// Returns a one character string representation of this suit.
+        /// E.g. AsString(Suit.Diamonds) => "D"
+        /// </summary>
+        /// <param name="suit"></param>
+        /// <returns></returns>
+        public static string AsString(this Suit suit) =>
+            suit switch
             {
-                _ => "Hello World"
+                Suit.Diamonds => "D",
+                Suit.Hearts => "H",
+                Suit.Clubs => "C",
+                Suit.Spades => "S",
+                _ => throw new ArgumentException($"Unknown suit {suit}")
             };
-        }
-
     }
 }

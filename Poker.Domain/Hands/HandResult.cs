@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 
 namespace Poker.Domain.Hands
@@ -55,6 +56,27 @@ namespace Poker.Domain.Hands
 
             // Got here then there truly was no way to separate these hands.
             return 0;
+        }
+
+        /// <summary>
+        /// Builds a string representation of the winning cards.
+        /// E.g. FullHouse (Jack of Spades, Jack of Diamonds, Jack of Hearts, Eight of Clubs, Eight of Diamonds)
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            var str = Strength.ToString() + " (";
+            
+            for (var coreIndex = 0; coreIndex < Core.Count; coreIndex++)
+            {
+                str += Core[coreIndex].ToString();
+                if (coreIndex < Core.Count - 1)
+                    str += ", ";
+            }
+
+            str += "" + ")";
+
+            return str;
         }
     }
 }

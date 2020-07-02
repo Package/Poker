@@ -67,6 +67,32 @@ namespace Poker.Domain
                 return -1;
             return 0;
         }
+
+        /// <summary>
+        /// Checks for equality between two card objects.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (obj != null && obj is Card)
+            {
+                var other = ((Card)obj);
+                return other.Value == Value && other.Suit == Suit;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Value, Suit);
+        }
+
+        public override string ToString()
+        {
+            return $"{Value} of {Suit}";
+        }
     }
 }
 

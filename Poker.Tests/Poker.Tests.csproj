@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Poker.Domain\Poker.Domain.csproj" />
+    <ProjectReference Include="..\Poker.Engine\Poker.Engine.csproj" />
     <ProjectReference Include="..\Poker.Evaluator\Poker.Evaluator.csproj" />
   </ItemGroup>
 
