@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Poker.Domain.Players;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,12 +44,27 @@ namespace Poker.Domain
         }
 
         /// <summary>
+        /// Removes the provided hole cards from the deck.
+        /// </summary>
+        /// <param name="players"></param>
+        public void RemovePlayerHoleCards(ICollection<Player> players)
+        {
+            foreach (var player in players)
+            {
+                foreach (var card in player.Hand.Cards)
+                {
+                    Cards.Remove(card);
+                }
+            }
+        }
+
+        /// <summary>
         /// Takes the specified number of cards from the deck. The cards are subsequently removed.
         /// This assumes that the you have been previously called Shuffle() to randomise the card order in the collection.
         /// </summary>
         /// <param name="numberOfCards"></param>
         /// <returns></returns>
-        public ICollection<Card> Take(int numberOfCards)
+        public List<Card> Take(int numberOfCards)
         {
             if (numberOfCards < 1 || numberOfCards >= Cards.Count)
             {

@@ -7,7 +7,7 @@ namespace Poker.Domain
 {
     public class Hand
     {
-        public ICollection<Card> Cards { get; private set; }
+        public List<Card> Cards { get; set; }
 
         /// <summary>
         /// Creates a Hand from the provided string.
@@ -33,7 +33,7 @@ namespace Poker.Domain
         /// </summary>
         /// <param name="cards"></param>
         /// <returns></returns>
-        public static Hand FromCards(ICollection<Card> cards)
+        public static Hand FromCards(List<Card> cards)
         {
             return new Hand { Cards = cards };
         }
