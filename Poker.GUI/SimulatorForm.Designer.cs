@@ -1,6 +1,6 @@
 ﻿namespace Poker.GUI
 {
-    partial class GameForm
+    partial class SimulatorForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,13 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtHole = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtCommunity = new System.Windows.Forms.TextBox();
-            this.txtComplete = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.btnPlay = new System.Windows.Forms.Button();
             this.playerOneCardOne = new System.Windows.Forms.ComboBox();
             this.playerOneCardTwo = new System.Windows.Forms.ComboBox();
             this.playerTwoCardOne = new System.Windows.Forms.ComboBox();
@@ -51,67 +44,6 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericHands)).BeginInit();
             this.SuspendLayout();
-            // 
-            // txtHole
-            // 
-            this.txtHole.Location = new System.Drawing.Point(21, 40);
-            this.txtHole.Multiline = true;
-            this.txtHole.Name = "txtHole";
-            this.txtHole.Size = new System.Drawing.Size(253, 143);
-            this.txtHole.TabIndex = 0;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(21, 11);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 15);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Hole Cards";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(298, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(101, 15);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Community Dealt";
-            // 
-            // txtCommunity
-            // 
-            this.txtCommunity.Location = new System.Drawing.Point(298, 40);
-            this.txtCommunity.Multiline = true;
-            this.txtCommunity.Name = "txtCommunity";
-            this.txtCommunity.Size = new System.Drawing.Size(253, 143);
-            this.txtCommunity.TabIndex = 0;
-            // 
-            // txtComplete
-            // 
-            this.txtComplete.Location = new System.Drawing.Point(575, 40);
-            this.txtComplete.Multiline = true;
-            this.txtComplete.Name = "txtComplete";
-            this.txtComplete.Size = new System.Drawing.Size(253, 143);
-            this.txtComplete.TabIndex = 0;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(575, 11);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(91, 15);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "Hand Complete";
-            // 
-            // btnPlay
-            // 
-            this.btnPlay.Location = new System.Drawing.Point(21, 200);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(75, 23);
-            this.btnPlay.TabIndex = 2;
-            this.btnPlay.Text = "Play Hand";
-            this.btnPlay.UseVisualStyleBackColor = true;
-            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 
             // playerOneCardOne
             // 
@@ -147,7 +79,7 @@
             // 
             // btnRunSim
             // 
-            this.btnRunSim.Location = new System.Drawing.Point(255, 165);
+            this.btnRunSim.Location = new System.Drawing.Point(255, 249);
             this.btnRunSim.Name = "btnRunSim";
             this.btnRunSim.Size = new System.Drawing.Size(105, 23);
             this.btnRunSim.TabIndex = 5;
@@ -187,9 +119,9 @@
             this.groupBox1.Controls.Add(this.btnRunSim);
             this.groupBox1.Controls.Add(this.playerTwoCardOne);
             this.groupBox1.Controls.Add(this.playerTwoCardTwo);
-            this.groupBox1.Location = new System.Drawing.Point(21, 251);
+            this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(423, 219);
+            this.groupBox1.Size = new System.Drawing.Size(423, 288);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Simulator";
@@ -197,7 +129,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(45, 167);
+            this.label9.Location = new System.Drawing.Point(36, 251);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(41, 15);
             this.label9.TabIndex = 10;
@@ -205,7 +137,7 @@
             // 
             // numericHands
             // 
-            this.numericHands.Location = new System.Drawing.Point(94, 165);
+            this.numericHands.Location = new System.Drawing.Point(85, 249);
             this.numericHands.Name = "numericHands";
             this.numericHands.Size = new System.Drawing.Size(93, 23);
             this.numericHands.TabIndex = 9;
@@ -235,41 +167,26 @@
             this.label6.TabIndex = 7;
             this.label6.Text = "label6";
             // 
-            // GameForm
+            // SimulatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(887, 597);
+            this.ClientSize = new System.Drawing.Size(455, 312);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.btnPlay);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.txtComplete);
-            this.Controls.Add(this.txtCommunity);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtHole);
-            this.Name = "GameForm";
-            this.Text = "Form1";
+            this.Name = "SimulatorForm";
+            this.Text = "Hand Simulator";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericHands)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.TextBox t;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox x;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox txtComplete;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox txtHole;
-        private System.Windows.Forms.TextBox txtCommunity;
-        private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.Label playt;
         private System.Windows.Forms.ComboBox playerOneCardOne;
         private System.Windows.Forms.ComboBox playerOneCardTwo;
