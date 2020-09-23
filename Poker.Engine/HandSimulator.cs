@@ -120,6 +120,16 @@ namespace Poker.Engine
         }
 
         /// <summary>
+        /// Formats the win percentage to 2DP.
+        /// </summary>
+        /// <param name="percentage"></param>
+        /// <returns></returns>
+        public string FormatWinPercentage(double percentage)
+        {
+            return (percentage * 100).ToString("0.##");
+        }
+
+        /// <summary>
         /// Creates the players that will be involved in the simulation.
         /// </summary>
         /// <param name="numberOfPlayers"></param>

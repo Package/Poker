@@ -39,6 +39,9 @@ namespace Poker.GUI
         /// <param name="e"></param>
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            lblPlayerOneWins.Text = string.Empty;
+            lblPlayerTwoWins.Text = string.Empty;
+
             var cardOne = $"{(string)playerOneCardOne.SelectedItem} {(string)playerOneCardTwo.SelectedItem}";
             var cardTwo = $"{(string)playerTwoCardOne.SelectedItem} {(string)playerTwoCardTwo.SelectedItem}";
 
@@ -49,8 +52,8 @@ namespace Poker.GUI
             simulator.Simulate();
 
             var resultPercentages = simulator.GetPlayerWinsAsPercentage();
-            lblPlayerOneWins.Text = $"{(resultPercentages[playerOne] * 100)}%";
-            lblPlayerTwoWins.Text = $"{(resultPercentages[playerTwo] * 100)}%";
+            lblPlayerOneWins.Text = $"Wins ({simulator.WinMap[playerOne]}): {simulator.FormatWinPercentage(resultPercentages[playerOne])}%";
+            lblPlayerTwoWins.Text = $"Wins ({simulator.WinMap[playerTwo]}): {simulator.FormatWinPercentage(resultPercentages[playerTwo])}%";
         }
 
         /// <summary>

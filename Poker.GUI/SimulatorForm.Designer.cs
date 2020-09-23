@@ -47,6 +47,7 @@
             // 
             // playerOneCardOne
             // 
+            this.playerOneCardOne.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.playerOneCardOne.FormattingEnabled = true;
             this.playerOneCardOne.Location = new System.Drawing.Point(48, 56);
             this.playerOneCardOne.Name = "playerOneCardOne";
@@ -55,6 +56,7 @@
             // 
             // playerOneCardTwo
             // 
+            this.playerOneCardTwo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.playerOneCardTwo.FormattingEnabled = true;
             this.playerOneCardTwo.Location = new System.Drawing.Point(48, 85);
             this.playerOneCardTwo.Name = "playerOneCardTwo";
@@ -63,6 +65,7 @@
             // 
             // playerTwoCardOne
             // 
+            this.playerTwoCardOne.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.playerTwoCardOne.FormattingEnabled = true;
             this.playerTwoCardOne.Location = new System.Drawing.Point(239, 56);
             this.playerTwoCardOne.Name = "playerTwoCardOne";
@@ -71,6 +74,7 @@
             // 
             // playerTwoCardTwo
             // 
+            this.playerTwoCardTwo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.playerTwoCardTwo.FormattingEnabled = true;
             this.playerTwoCardTwo.Location = new System.Drawing.Point(239, 85);
             this.playerTwoCardTwo.Name = "playerTwoCardTwo";
